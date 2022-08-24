@@ -38,7 +38,6 @@ services:
     restart: always
     depends_on:
       - tweeter-mongodb
-      - kafka-server
     build:
       context: ../tweeter-messages-read-api/
       dockerfile: ../tweeter-messages-read-api/Api/Dockerfile
@@ -48,6 +47,26 @@ services:
       DB_CONNECTION_STRING: mongodb://tweeter-mongodb:27017
       DB_NAME: tweeter-messages
       DB_TWEET_COLLECTION: tweet
+      ASPNETCORE_ENVIRONMENT: Development
+
+  tweeter-messages-synchroniser:
+    image: tweeter-messages-synchroniser:latest
+    container_name: synchroniser
+    restart: always
+    depends_on:
+      - tweeter-mongodb
+      - kafka-server
+    build:
+      context: ../tweeter-messages-synchroniser/
+      dockerfile: ../tweeter-messages-synchroniser/Synchroniser/Dockerfile
+    ports:
+      - 8002:80    
+    environment:
+      DB_CONNECTION_STRING: mongodb://tweeter-mongodb:27017
+      DB_NAME: tweeter-messages
+      DB_TWEET_COLLECTION: tweet
+      KAFKA_CREATE_TWEET_TOPIC_NAME: "CreateTweet"
+      KAFKA_ADD_REPLY_TOPIC_NAME: "AddReply"
       ASPNETCORE_ENVIRONMENT: Development
 
   zookeeper-server:
