@@ -27,6 +27,7 @@ services:
       DB_CONNECTION_STRING: mongodb://tweeter-mongodb:27017
       DB_NAME: tweeter-messages
       DB_TWEET_COLLECTION: tweet
+      DB_REPLY_COLLECTION: reply
       KAFKA_SERVER: kafka-server:29092
       KAFKA_CREATE_TWEET_TOPIC_NAME: "CreateTweet"
       KAFKA_ADD_REPLY_TOPIC_NAME: "AddReply"
@@ -47,6 +48,7 @@ services:
       DB_CONNECTION_STRING: mongodb://tweeter-mongodb:27017
       DB_NAME: tweeter-messages
       DB_TWEET_COLLECTION: tweet
+      DB_REPLY_COLLECTION: reply
       ASPNETCORE_ENVIRONMENT: Development
 
   tweeter-messages-synchroniser:
@@ -65,6 +67,7 @@ services:
       DB_CONNECTION_STRING: mongodb://tweeter-mongodb:27017
       DB_NAME: tweeter-messages
       DB_TWEET_COLLECTION: tweet
+      DB_REPLY_COLLECTION: reply
       KAFKA_SERVER: kafka-server:29092
       KAFKA_CREATE_TWEET_TOPIC_NAME: "CreateTweet"
       KAFKA_ADD_REPLY_TOPIC_NAME: "AddReply"
