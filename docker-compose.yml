@@ -73,6 +73,33 @@ services:
       KAFKA_ADD_REPLY_TOPIC_NAME: "AddReply"
       ASPNETCORE_ENVIRONMENT: Development
 
+  identity-server-db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: identity-server-db
+    restart: always
+    volumes:
+      - ./mssql/data:/var/opt/mssql/data
+    ports:
+      - 1433:1433
+    environment:
+      ACCEPT_EULA: Y
+      SA_PASSWORD: mypassword123
+
+  identity-server:
+    image: tweeter-identity-server:latest
+    container_name: identity-server
+    restart: always
+    depends_on:
+      - identity-server-db
+    build:
+      context: ../tweeter-identity-server/
+      dockerfile: ../tweeter-identity-server/Web/Dockerfile
+    ports:
+      - 8003:80    
+    environment:
+      DB_CONNECTION_STRING: Initial Catalog=tweeterIdentity; Data Source=identity-server-db; Persist Security Info=True;User ID=SA;Password=mypassword123
+      ASPNETCORE_ENVIRONMENT: Development
+
   zookeeper-server:
     image: bitnami/zookeeper:latest
     container_name: zookeeper-server
