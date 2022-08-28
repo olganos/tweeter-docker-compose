@@ -100,6 +100,20 @@ services:
       DB_CONNECTION_STRING: Initial Catalog=tweeterIdentity; Data Source=identity-server-db; Persist Security Info=True;User ID=SA;Password=mypassword123
       ASPNETCORE_ENVIRONMENT: Development
 
+  tweeter-api-gateway:
+    image: tweeter-api-gateway:latest
+    container_name: gateway
+    restart: always
+    ##depends_on:
+      #todo: all backend servises
+    build:
+      context: ../tweeter-api-gateway/
+      dockerfile: ../tweeter-api-gateway/Gateway/Dockerfile
+    ports:
+      - 5050:80    
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+
   zookeeper-server:
     image: bitnami/zookeeper:latest
     container_name: zookeeper-server
