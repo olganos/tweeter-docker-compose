@@ -58,6 +58,8 @@ services:
     depends_on:
       - tweeter-mongodb
       - kafka-server
+      - prometheus
+      - grafana
     build:
       context: ../tweeter-messages-synchroniser/
       dockerfile: ../tweeter-messages-synchroniser/Synchroniser/Dockerfile
@@ -104,8 +106,9 @@ services:
     image: tweeter-api-gateway:latest
     container_name: gateway
     restart: always
-    ##depends_on:
-      #todo: all backend servises
+    depends_on:
+      - tweeter-messages-read-api
+      - tweeter-messages-write-api
     build:
       context: ../tweeter-api-gateway/
       dockerfile: ../tweeter-api-gateway/Gateway/Dockerfile
@@ -170,15 +173,21 @@ services:
       kafka-topics.sh --bootstrap-server kafka-server:29092 --list
       "
 
-  # todo: I copied it from an example and I leaved it just because I was afraid to delete
-  schema-registry:
-    image: confluentinc/cp-schema-registry:latest
-    container_name: schema-registry
+  prometheus:
+    image: ubuntu/prometheus
+    container_name: prometheus
     ports:
-      - 8081:8081
+      - "30090:9090"
     environment:
-      - SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS=PLAINTEXT://kafka-server:29092
-      - SCHEMA_REGISTRY_HOST_NAME=localhost
-      - SCHEMA_REGISTRY_LISTENERS=http://0.0.0.0:8081
-    depends_on:
-      - kafka-server      
+      - TZ=UTC
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "30091:3000"
+    volumes:
+      - ./grafana-data/data:/var/lib/grafana
+   
