@@ -10,12 +10,22 @@ alerting:
     static_configs:
     - targets: []
 scrape_configs:
-- job_name: TrackMyAPIUsage
+- job_name: TrackReadAPIUsage
   honor_timestamps: true
   scrape_interval: 15s  
   scrape_timeout: 10s  
-  metrics_path: /read/metrics  
+  metrics_path: /metrics  
   scheme: http  
   static_configs:  
   - targets:  
-    - tweeter-api-gateway:80
+    - tweeter-messages-read-api
+    
+- job_name: TrackWriteAPIUsage
+  honor_timestamps: true
+  scrape_interval: 15s  
+  scrape_timeout: 10s  
+  metrics_path: /metrics  
+  scheme: http 
+  static_configs:  
+  - targets:  
+    - tweeter-messages-write-api

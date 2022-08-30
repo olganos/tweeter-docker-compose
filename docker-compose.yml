@@ -22,7 +22,7 @@ services:
       context: ../tweeter-messages-api/
       dockerfile: ../tweeter-messages-api/Api/Dockerfile
     ports:
-      - 8000:80    
+      - 8000:80
     environment:
       DB_CONNECTION_STRING: mongodb://tweeter-mongodb:27017
       DB_NAME: tweeter-messages
