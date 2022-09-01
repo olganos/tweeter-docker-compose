@@ -31,6 +31,7 @@ services:
       KAFKA_SERVER: kafka-server:29092
       KAFKA_CREATE_TWEET_TOPIC_NAME: "CreateTweet"
       KAFKA_ADD_REPLY_TOPIC_NAME: "AddReply"
+      LOGSTASH_URI: http://logstash:28080
       ASPNETCORE_ENVIRONMENT: Development
 
   tweeter-messages-read-api:
@@ -49,6 +50,7 @@ services:
       DB_NAME: tweeter-messages
       DB_TWEET_COLLECTION: tweet
       DB_REPLY_COLLECTION: reply
+      LOGSTASH_URI: http://logstash:28080
       ASPNETCORE_ENVIRONMENT: Development
 
   tweeter-messages-synchroniser:
@@ -191,3 +193,41 @@ services:
     volumes:
       - ./grafana-data/data:/var/lib/grafana
    
+  elasticsearch:
+    container_name: elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.16.1
+    ports:
+     - 9200:9200
+    volumes:
+     - ./elasticsearch-data:/usr/share/elasticsearch/data
+    environment:
+     - xpack.monitoring.enabled=true
+     - xpack.watcher.enabled=false
+     - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+     - discovery.type=single-node
+
+  kibana:
+    container_name: kibana
+    image: docker.elastic.co/kibana/kibana:7.16.1
+    ports:
+     - 5601:5601
+    depends_on:
+     - elasticsearch
+    environment:
+     - "ELASTICSEARCH_URL=http://elasticsearch:9200"
+
+  logstash: 
+    container_name: logstash
+    image: docker.elastic.co/logstash/logstash:8.4.1
+    volumes:
+      - ./logstash:/usr/share/logstash/pipeline
+    ports:
+      - 5000:5000
+    #environment:
+      #
+    environment:
+      - "XPACK_MONITORING_ELASTICSEARCH_URL=http://elasticsearch:9200"
+      - "LS_JAVA_OPTS=-Xmx256m -Xms256m"
+    depends_on:
+      - elasticsearch
+      - kibana
