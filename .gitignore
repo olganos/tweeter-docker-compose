@@ -2,3 +2,4 @@
 /mssql
 /grafana-data
 /elasticsearch-data
+/pgdata
