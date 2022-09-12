@@ -11,47 +11,51 @@ services:
     ports:
       - 8007:27017
 
-  tweeter-messages-write-api:
-    image: tweeter-messages-api:latest
-    container_name: write-api
-    restart: always
-    depends_on:
-      - tweeter-mongodb
-      - kafka-server
-    build:
-      context: ../tweeter-messages-api/
-      dockerfile: ../tweeter-messages-api/Api/Dockerfile
-    ports:
-      - 8000:80
-    environment:
-      DB_CONNECTION_STRING: mongodb://tweeter-mongodb:27017
-      DB_NAME: tweeter-messages
-      DB_TWEET_COLLECTION: tweet
-      DB_REPLY_COLLECTION: reply
-      KAFKA_SERVER: kafka-server:29092
-      KAFKA_CREATE_TWEET_TOPIC_NAME: "CreateTweet"
-      KAFKA_ADD_REPLY_TOPIC_NAME: "AddReply"
-      LOGSTASH_URI: http://logstash:28080
-      ASPNETCORE_ENVIRONMENT: Development
+  # tweeter-messages-write-api:
+  #   image: tweeter-messages-api:latest
+  #   container_name: write-api
+  #   restart: always
+  #   depends_on:
+  #     - tweeter-mongodb
+  #     - kafka-server
+  #   build:
+  #     context: ../tweeter-messages-api/
+  #     dockerfile: ../tweeter-messages-api/Api/Dockerfile
+  #   ports:
+  #     - 8000:80
+  #   environment:
+  #     DB_CONNECTION_STRING: mongodb://tweeter-mongodb:27017
+  #     DB_NAME: tweeter-messages
+  #     DB_TWEET_COLLECTION: tweet
+  #     DB_REPLY_COLLECTION: reply
+  #     KAFKA_SERVER: kafka-server:29092
+  #     KAFKA_CREATE_TWEET_TOPIC_NAME: "CreateTweet"
+  #     KAFKA_ADD_REPLY_TOPIC_NAME: "AddReply"
+  #     LOGSTASH_URI: http://logstash:28080
+  #     IDENTITY_SERVER_URI: https://localhost:8003
+  #     ASPNETCORE_ENVIRONMENT: Development
+  #   # networks:
+  #   #   - identity-dev
 
-  tweeter-messages-read-api:
-    image: tweeter-messages-read-api:latest
-    container_name: read-api
-    restart: always
-    depends_on:
-      - tweeter-mongodb
-    build:
-      context: ../tweeter-messages-read-api/
-      dockerfile: ../tweeter-messages-read-api/Api/Dockerfile
-    ports:
-      - 8001:80    
-    environment:
-      DB_CONNECTION_STRING: mongodb://tweeter-mongodb:27017
-      DB_NAME: tweeter-messages
-      DB_TWEET_COLLECTION: tweet
-      DB_REPLY_COLLECTION: reply
-      LOGSTASH_URI: http://logstash:28080
-      ASPNETCORE_ENVIRONMENT: Development
+  # tweeter-messages-read-api:
+  #   image: tweeter-messages-read-api:latest
+  #   container_name: read-api
+  #   restart: always
+  #   depends_on:
+  #     - tweeter-mongodb
+  #   build:
+  #     context: ../tweeter-messages-read-api/
+  #     dockerfile: ../tweeter-messages-read-api/Api/Dockerfile
+  #   ports:
+  #     - 8001:80    
+  #   environment:
+  #     DB_CONNECTION_STRING: mongodb://tweeter-mongodb:27017
+  #     DB_NAME: tweeter-messages
+  #     DB_TWEET_COLLECTION: tweet
+  #     DB_REPLY_COLLECTION: reply
+  #     LOGSTASH_URI: http://logstash:28080
+  #     IDENTITY_SERVER_URI: https://localhost:8003
+  #     ASPNETCORE_ENVIRONMENT: Development
 
   tweeter-messages-synchroniser:
     image: tweeter-messages-synchroniser:latest
@@ -93,36 +97,38 @@ services:
       POSTGRES_DB: "tweeterIdentity"
 
   # todo: doesn't work because identity server should be https
-  identity-server:
-    image: tweeter-identity-server:latest
-    container_name: identity-server
-    restart: always
-    depends_on:
-      - identity-server-db
-    build:
-      context: ../tweeter-identity-server/
-      dockerfile: ../tweeter-identity-server/IdentityServer/Dockerfile
-    ports:
-      - 8003:80    
-    environment:
-      DB_CONNECTION_STRING: "host=identity-server-db;port=5432;database=tweeterIdentity;username=tweeter;password=tweeter"
-      CLIENT_REACT_BFF_BASEURL: https://localhost:44485
-      ASPNETCORE_ENVIRONMENT: Development
+  # identity-server:
+  #   image: tweeter-identity-server:latest
+  #   container_name: identity-server
+  #   restart: always
+  #   depends_on:
+  #     - identity-server-db
+  #   build:
+  #     context: ../tweeter-identity-server/
+  #     dockerfile: ../tweeter-identity-server/IdentityServer/Dockerfile
+  #   ports:
+  #     - 8003:443    
+  #   environment:
+  #     DB_CONNECTION_STRING: "host=identity-server-db;port=5432;database=tweeterIdentity;username=tweeter;password=tweeter"
+  #     CLIENT_REACT_BFF_BASEURL: https://localhost:44485
+  #     ASPNETCORE_ENVIRONMENT: Development
+  #   networks:
+  #     - identity-dev
 
-  tweeter-api-gateway:
-    image: tweeter-api-gateway:latest
-    container_name: gateway
-    restart: always
-    depends_on:
-      - tweeter-messages-read-api
-      - tweeter-messages-write-api
-    build:
-      context: ../tweeter-api-gateway/
-      dockerfile: ../tweeter-api-gateway/Gateway/Dockerfile
-    ports:
-      - 5050:80    
-    environment:
-      ASPNETCORE_ENVIRONMENT: Development
+  # tweeter-api-gateway:
+  #   image: tweeter-api-gateway:latest
+  #   container_name: gateway
+  #   restart: always
+  #   depends_on:
+  #     - tweeter-messages-read-api
+  #     - tweeter-messages-write-api
+  #   build:
+  #     context: ../tweeter-api-gateway/
+  #     dockerfile: ../tweeter-api-gateway/Gateway/Dockerfile
+  #   ports:
+  #     - 5050:80    
+  #   environment:
+  #     ASPNETCORE_ENVIRONMENT: Development
 
   zookeeper-server:
     image: bitnami/zookeeper:latest
@@ -244,3 +250,8 @@ services:
       - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true
     ports:
       - 9001:9000
+
+#networks:
+  # id order identity server works on development
+  # identity-dev:
+  #   driver: bridge
