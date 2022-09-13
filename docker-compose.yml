@@ -76,16 +76,18 @@ services:
       DB_NAME: tweeter-messages
       DB_TWEET_COLLECTION: tweet
       DB_REPLY_COLLECTION: reply
+      DB_USER_COLLECTION: user
       KAFKA_SERVER: kafka-server:29092
       KAFKA_CREATE_TWEET_TOPIC_NAME: "CreateTweet"
       KAFKA_ADD_REPLY_TOPIC_NAME: "AddReply"
+      KAFKA_ADD_USER_TOPIC_NAME: "AddUser"
       ASPNETCORE_ENVIRONMENT: Development
 
   identity-server-db:
     image: postgres:latest
     container_name: identity-server-db
     ports:
-      - 5432:5432
+      - 5433:5432
     restart: always
     volumes:
       - ./pgdata:/var/lib/postgresql/data
@@ -111,6 +113,8 @@ services:
   #   environment:
   #     DB_CONNECTION_STRING: "host=identity-server-db;port=5432;database=tweeterIdentity;username=tweeter;password=tweeter"
   #     CLIENT_REACT_BFF_BASEURL: https://localhost:44485
+  #     KAFKA_SERVER: kafka-server:29092
+  #     KAFKA_ADD_USER_TOPIC_NAME: "AddUser"
   #     ASPNETCORE_ENVIRONMENT: Development
   #   networks:
   #     - identity-dev
@@ -156,6 +160,7 @@ services:
     container_name: kafka-server
     ports:
       - 9092:9092
+      - 29092:29092
     environment:
       - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper-server:2181
       - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-server:29092,PLAINTEXT_HOST://127.0.0.1:9092
@@ -181,6 +186,7 @@ services:
       echo -e 'Creating kafka topics'
       kafka-topics.sh --bootstrap-server kafka-server:29092 --create --if-not-exists --topic CreateTweet --replication-factor 1 --partitions 1
       kafka-topics.sh --bootstrap-server kafka-server:29092 --create --if-not-exists --topic AddReply --replication-factor 1 --partitions 1
+      kafka-topics.sh --bootstrap-server kafka-server:29092 --create --if-not-exists --topic AddUser --replication-factor 1 --partitions 1
 
       echo -e 'Successfully created the following topics:'
       kafka-topics.sh --bootstrap-server kafka-server:29092 --list
