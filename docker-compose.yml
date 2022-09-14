@@ -53,6 +53,7 @@ services:
   #     DB_NAME: tweeter-messages
   #     DB_TWEET_COLLECTION: tweet
   #     DB_REPLY_COLLECTION: reply
+  #     DB_USER_COLLECTION: user
   #     LOGSTASH_URI: http://logstash:28080
   #     IDENTITY_SERVER_URI: https://localhost:8003
   #     ASPNETCORE_ENVIRONMENT: Development
