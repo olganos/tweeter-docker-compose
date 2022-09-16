@@ -28,6 +28,7 @@ services:
   #     DB_NAME: tweeter-messages
   #     DB_TWEET_COLLECTION: tweet
   #     DB_REPLY_COLLECTION: reply
+  #     DB_LIKE_COLLECTION: like
   #     KAFKA_SERVER: kafka-server:29092
   #     KAFKA_CREATE_TWEET_TOPIC_NAME: "CreateTweet"
   #     KAFKA_ADD_REPLY_TOPIC_NAME: "AddReply"
