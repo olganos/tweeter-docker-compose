@@ -25,3 +25,10 @@ to deploy into Azure
     tweeter-write-*
 
     I couldn't connect with logstash in production, so in the Azure I just send the data into elastic directly
+
+    I use Docker file for elastic, because it needs some env variables, but Azure doesn't support this naming format
+
+To run locally
+
+1. docker compose -f docker-compose-api.yml -f docker-compose-elastic.yml -f docker-compose-identity.yml -f docker-compose-kafka.yml -f docker-compose-prometheus.yml  up --build
+2. Run frontend, identity, write, read and gateway manually. These services, excepts frontend, need https, but I didn't cope with https in docker

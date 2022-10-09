@@ -1,0 +1,103 @@
+version: '3.9'
+
+services:
+
+  tweeter-mongodb:
+    image: mongo:latest
+    container_name: tweeter-mongodb
+    restart: always
+    volumes:
+      - ./mongo/data:/data/db
+    ports:
+      - 8007:27017
+
+  # todo: fix https in docker. write, read and gateway doesn't work in docker because they need htts to work with identity
+  # tweeter-messages-write-api:
+  #   image: tweeter-messages-api:latest
+  #   container_name: write-api
+  #   restart: always
+  #   depends_on:
+  #     - tweeter-mongodb
+  #   build:
+  #     context: ../tweeter-messages-api/
+  #     dockerfile: ../tweeter-messages-api/Api/Dockerfile
+  #   ports:
+  #     - 8000:80
+  #   environment:
+  #     DB_CONNECTION_STRING: mongodb://tweeter-mongodb:27017
+  #     DB_NAME: tweeter-messages
+  #     DB_TWEET_COLLECTION: tweet
+  #     DB_REPLY_COLLECTION: reply
+  #     DB_LIKE_COLLECTION: like
+  #     KAFKA_SERVER: kafka-server:29092
+  #     KAFKA_CREATE_TWEET_TOPIC_NAME: "CreateTweet"
+  #     KAFKA_ADD_REPLY_TOPIC_NAME: "AddReply"
+  #     # todo: add condition into Program.cs to use logstash locally
+  #     LOGSTASH_URI: http://locahost:28080
+  #     IDENTITY_SERVER_URI: https://localhost:8003
+  #     ELASTICSEARCH_URI: http://localhost:9200
+  #     ASPNETCORE_ENVIRONMENT: Development
+  #   # networks:
+  #   #   - identity-dev
+
+  # tweeter-messages-read-api:
+  #   image: tweeter-messages-read-api:latest
+  #   container_name: read-api
+  #   restart: always
+  #   depends_on:
+  #     - tweeter-mongodb
+  #   build:
+  #     context: ../tweeter-messages-read-api/
+  #     dockerfile: ../tweeter-messages-read-api/Api/Dockerfile
+  #   ports:
+  #     - 8001:80    
+  #   environment:
+  #     DB_CONNECTION_STRING: mongodb://tweeter-mongodb:27017
+  #     DB_NAME: tweeter-messages
+  #     DB_TWEET_COLLECTION: tweet
+  #     DB_REPLY_COLLECTION: reply
+  #     DB_USER_COLLECTION: user
+  #     # todo: add condition into Program.cs to use logstash locally
+  #     LOGSTASH_URI: http://localhost:28080
+  #     IDENTITY_SERVER_URI: https://localhost:8003
+  #     ELASTICSEARCH_URI: http://localhost:9200
+  #     ASPNETCORE_ENVIRONMENT: Development
+
+  tweeter-messages-synchroniser:
+    image: tweeter-messages-synchroniser:latest
+    container_name: synchroniser
+    restart: always
+    depends_on:
+      - tweeter-mongodb
+    build:
+      context: ../tweeter-messages-synchroniser/
+      dockerfile: ../tweeter-messages-synchroniser/Synchroniser/Dockerfile
+    ports:
+      - 8002:80    
+    environment:
+      DB_CONNECTION_STRING: mongodb://tweeter-mongodb:27017
+      DB_NAME: tweeter-messages
+      DB_TWEET_COLLECTION: tweet
+      DB_REPLY_COLLECTION: reply
+      DB_USER_COLLECTION: user
+      KAFKA_SERVER: localhost:29092
+      KAFKA_CREATE_TWEET_TOPIC_NAME: "CreateTweet"
+      KAFKA_ADD_REPLY_TOPIC_NAME: "AddReply"
+      KAFKA_ADD_USER_TOPIC_NAME: "AddUser"
+      ELASTICSEARCH_URI: http://localhost:9200
+      ASPNETCORE_ENVIRONMENT: Development
+  
+  # tweeter-api-gateway:
+  #   image: tweeter-api-gateway:latest
+  #   container_name: gateway
+  #   restart: always
+  #   depends_on:
+  #     - tweeter-messages-read-api
+  #     - tweeter-messages-write-api
+  #   build:
+  #     context: ../tweeter-api-gateway/
+  #     dockerfile: ../tweeter-api-gateway/Gateway/Dockerfile
+  #   ports:
+  #     - 5050:80    
+  #   environment:
+  #     ASPNETCORE_ENVIRONMENT: Development

@@ -1,0 +1,39 @@
+version: '3.9'
+
+services:
+
+  identity-server-db:
+    image: postgres:latest
+    container_name: identity-server-db
+    ports:
+      - 5433:5432
+    restart: always
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+      - ./pgconf:/etc/postgresql
+      - ./pglog:/var/log/postgresql
+    environment:
+      POSTGRES_USER: "tweeter"
+      POSTGRES_PASSWORD: "tweeter"
+      POSTGRES_DB: "tweeterIdentity"
+
+  # todo: doesn't work because identity server should be https
+  # identity-server:
+  #   image: tweeter-identity-server:latest
+  #   container_name: identity-server
+  #   restart: always
+  #   depends_on:
+  #     - identity-server-db
+  #   build:
+  #     context: ../tweeter-identity-server/
+  #     dockerfile: ../tweeter-identity-server/IdentityServer/Dockerfile
+  #   ports:
+  #     - 8003:443    
+  #   environment:
+  #     DB_CONNECTION_STRING: "host=identity-server-db;port=5432;database=tweeterIdentity;username=tweeter;password=tweeter"
+  #     CLIENT_REACT_BFF_BASEURL: https://localhost:44485
+  #     KAFKA_SERVER: kafka-server:29092
+  #     KAFKA_ADD_USER_TOPIC_NAME: "AddUser"
+  #     ASPNETCORE_ENVIRONMENT: Development
+  #   networks:
+  #     - identity-dev
