@@ -1,0 +1,34 @@
+version: '3.9'
+
+services:
+  prometheus:
+    image: ubuntu/prometheus
+    container_name: prometheus
+    domainname: tweeter-app-prometheus-grafana
+    ports:
+      - "9090:9090"
+    environment:
+      - TZ=UTC
+    volumes:
+      - prometheus:/etc/prometheus
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    domainname: tweeter-app-prometheus-grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana:/var/lib/grafana  
+
+volumes:
+    prometheus:
+      driver: azure_file
+      driver_opts:
+          share_name: prometheus 
+          storage_account_name: prometheustweeterstoracc
+    grafana:
+      driver: azure_file
+      driver_opts:
+          share_name:  grafana
+          storage_account_name: prometheustweeterstoracc

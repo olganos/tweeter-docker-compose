@@ -1,0 +1,43 @@
+version: '3.9'
+
+services:
+  elasticsearch:
+    image: tweetercontainerregistry.azurecr.io/elasticsearch:v1
+    container_name: elasticsearch
+    restart: always
+    domainname: tweeter-app-elasticsearch
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ulimits: 
+      memlock:
+        soft: -1 
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    cap_add: 
+      - IPC_LOCK
+    volumes:
+      - elasticsearch:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+
+  kibana:
+    container_name: kibana
+    image: docker.elastic.co/kibana/kibana:7.16.1
+    restart: always
+    domainname: tweeter-app-elasticsearch
+    environment:
+      - "ELASTICSEARCH_URL=http://elasticsearch:9200"
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+      
+volumes:
+  elasticsearch:
+    driver: azure_file
+    driver_opts:
+      share_name: elasticsearch
+      storage_account_name: elastictweeterstoracc
