@@ -7,7 +7,6 @@ DOCKER_CONTEXT_ACI="elasticcontext"
 CONTAINER_REGISTRY_NAME="tweetercontainerregistry"
 
 STORAGE_ACCOUNT="elastictweeterstoracc"
-#SHARE_LOGSTASH_NAME="logstash"
 SHARE_ELASTICSEARCH_NAME="elasticsearch"
 
 docker context use default
